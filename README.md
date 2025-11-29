@@ -6,4 +6,4 @@
 `GET /api/persons`- get all persons
 `GET /api/persons/:id`- Get person by ID
 `POST /api/persons` - create new person
-`get /info` - Get aplication info
+`GET /info` - Get aplication info

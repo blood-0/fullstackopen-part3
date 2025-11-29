@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const path = require('path')
 const app = express()
 
 morgan.token('post-data',(req)=>{
@@ -12,6 +13,7 @@ morgan.token('post-data',(req)=>{
 app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - response-time ms :post-data'))
 app.use(express.json())
+app.use(express.static(path.join(__dirname,'dist')))
 
 let persons = [
     { 
@@ -92,6 +94,11 @@ app.get('/info',(request, response)=>{
      <p>${requestTime}</p>
   `)
 })
+
+app.get(/\/(?!api)/, (request, response) => {
+  response.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
 
 const PORT =  process.env.PORT || 3001
 app.listen(PORT, ()=>{
