@@ -86,6 +86,22 @@ app.delete('/api/persons/:id',(request, response,next)=>{
   .catch(error=>next(error))
 })
 
+app.put('/api/persons/:id',(request, response,next)=>{
+  Person.findByIdAndUpdate(
+    request.params.id,
+    {number:body.number},
+    {new:true,runValidators:true,context:'query'}
+  )
+    .then(updatedPerson=>{
+      if(updatedPerson){
+        response.json(updatedPerson)
+      }else{
+        response.status(404).json({error:'person not found'})
+      }
+    })
+    .catch(error => next(error))
+})
+
 app.post('/api/persons',(request, response,next)=>{ // POST 3.14
   const body = request.body
   
