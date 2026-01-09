@@ -14,14 +14,14 @@ mongoose.set('strictQuery', false)
 console.log('connecting to ', config.MONGODB_URI)
 
 mongoose.connect(config.MONGODB_URI)
-  .then(()=>{
+  .then(() => {
     console.log('connected to MongoDB')
   })
-  .catch(error=>{
+  .catch(error => {
     console.log('error connecting to MongoDB', error.message)
   })
 
-morgan.token('post-data',(req)=>{
+morgan.token('post-data',(req) => {
   if(req.method === 'POST'){
     return JSON.stringify(req.body)
   }
@@ -33,93 +33,93 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname,'dist')))
 
 
-app.get('/api/persons',(request,response,next)=>{
-    Person.find({})
-      .then(persons =>{
-        response.json(persons)
-      })
-      .catch(error => next(error))
+app.get('/api/persons',(request,response,next) => {
+  Person.find({})
+    .then(persons => {
+      response.json(persons)
+    })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id',(request, response,next)=>{
+app.get('/api/persons/:id',(request, response,next) => {
   Person.findById(request.params.id)
-    .then(person=>{
+    .then(person => {
       if(person){
         response.json(person)
       }else{
         response.status(404).end()
       }
     })
-    .catch(error=>next(error))
-  })
-  
-
-    
-
-app.delete('/api/persons/:id',(request, response,next)=>{
-  Person.findByIdAndDelete(request.params.id)
-  .then(result =>{
-    response.status(204).end()
-  })
-  .catch(error=>next(error))
+    .catch(error => next(error))
 })
 
-app.put('/api/persons/:id',(request, response,next)=>{
+
+
+
+app.delete('/api/persons/:id',(request, response,next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(() => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
+
+app.put('/api/persons/:id',(request, response,next) => {
   const body = request.body
-  
+
   Person.findByIdAndUpdate(
     request.params.id,
-    {number:body.number},
-    {new:true,runValidators:true,context:'query'}
+    { number:body.number },
+    { new:true,runValidators:true,context:'query' }
   )
-    .then(updatedPerson=>{
+    .then(updatedPerson => {
       if(updatedPerson){
         response.json(updatedPerson)
       }else{
-        response.status(404).json({error:'person not found'})
+        response.status(404).json({ error:'person not found' })
       }
     })
     .catch(error => next(error))
 })
 
-app.post('/api/persons',(request, response,next)=>{ // POST 3.14
+app.post('/api/persons',(request, response,next) => { // POST 3.14
   const body = request.body
-  
+
   const person = new Person({
     name:body.name,
     number:body.number
   })
 
   person.save()
-    .then(savedPerson=>{
+    .then(savedPerson => {
       response.json(savedPerson)
     })
-    .catch(error=>next(error))
+    .catch(error => next(error))
 
 })
 
-app.get('/info',(request, response,next)=>{
+app.get('/info',(request, response,next) => {
   Person.countDocuments({})
-    .then(count =>{
+    .then(count => {
       const requestTime = new Date()
       response.send(`
         <p>Phonebook has info for ${count} people</p>
         <p>${requestTime}</p>
       `)
     })
-    .catch(error=>next(error))
+    .catch(error => next(error))
 })
 
 app.get(/\/(?!api)/, (request, response) => {
   response.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
-const errorHandler = (error,request,response,next)=>{
+const errorHandler = (error,request,response,next) => {
   console.error(error.message)
   if(error.name === 'CastError'){
-    return response.status(400).json({error:'malformatted id'})
+    return response.status(400).json({ error:'malformatted id' })
   }else if(error.name === 'ValidationError'){
-    return response.status(400).json({error: error.message})
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }
@@ -127,6 +127,6 @@ app.use(errorHandler)
 
 
 const PORT =  process.env.PORT || 3001
-app.listen(config.PORT, ()=>{
-console.log(`server running on port ${config.PORT}`)
+app.listen(PORT, () => {
+  console.log(`server running on port ${config.PORT}`)
 })
